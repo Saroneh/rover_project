@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rover Camera Stream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+        .camera-feed {
+            text-align: center;
+            margin: 20px 0;
+        }
+        .camera-feed img {
+            max-width: 100%;
+            border: 2px solid #ddd;
+            border-radius: 4px;
+        }
+        .controls {
+            text-align: center;
+            margin: 20px 0;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .error {
+            color: #dc3545;
+        }
+        .success {
+            color: #28a745;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Rover Camera Stream</h1>
+        
+        <div class="camera-feed">
+            <img id="videoFeed" src="/video_feed" alt="Camera Feed" style="display: none;">
+            <div id="noCamera" style="display: block;">
+                <p>Camera not available</p>
+                <p>This is expected on Mac - the camera will work on Raspberry Pi</p>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="startBtn" onclick="startCamera()">Start Camera</button>
+            <button id="stopBtn" onclick="stopCamera()" disabled>Stop Camera</button>
+        </div>
+        
+        <div class="status">
+            <p>Status: <span id="cameraStatus">Ready</span></p>
+            <p>Camera Type: <span id="cameraType">Unknown</span></p>
+        </div>
+    </div>
+
+    <script>
+        function startCamera() {
+            fetch('/start_stream')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('cameraStatus').textContent = 'Streaming';
+                        document.getElementById('startBtn').disabled = true;
+                        document.getElementById('stopBtn').disabled = false;
+                        document.getElementById('videoFeed').style.display = 'block';
+                        document.getElementById('noCamera').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('cameraStatus').textContent = 'Error starting camera';
+                });
+        }
+
+        function stopCamera() {
+            fetch('/stop_stream')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('cameraStatus').textContent = 'Stopped';
+                        document.getElementById('startBtn').disabled = false;
+                        document.getElementById('stopBtn').disabled = true;
+                        document.getElementById('videoFeed').style.display = 'none';
+                        document.getElementById('noCamera').style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('cameraStatus').textContent = 'Error stopping camera';
+                });
+        }
+
+        // Update status on page load
+        window.onload = function() {
+            fetch('/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        document.getElementById('cameraType').textContent = data.camera_type || 'None';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error getting status:', error);
+                });
+        };
+    </script>
+</body>
+</html>

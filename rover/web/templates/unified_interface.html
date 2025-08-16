@@ -441,9 +441,6 @@
                             data.camera.is_streaming ? 'Streaming' : 'Stopped';
                         document.getElementById('gpioStatus').textContent = 
                             data.motor.gpio_mode.charAt(0).toUpperCase() + data.motor.gpio_mode.slice(1);
-                        
-                        // Update button states to keep them in sync
-                        updateButtonStates();
                     }
                 })
                 .catch(error => {
@@ -487,27 +484,8 @@
         
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Check camera status immediately
-            updateStatus();
-            updateButtonStates();
-            
-            // Auto-start camera after a short delay if not already streaming
-            setTimeout(function() {
-                fetch('/camera/status')
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.status === 'success' && !data.is_streaming) {
-                            startCamera();
-                        } else if (data.status === 'success' && data.is_streaming) {
-                            // Camera is already streaming, update UI
-                            updateButtonStates();
-                        }
-                    })
-                    .catch(error => {
-                        console.log('Auto-starting camera...');
-                        startCamera();
-                    });
-            }, 1000);
+            // Auto-start camera when page loads
+            setTimeout(startCamera, 1000);
         });
     </script>
 </body>
