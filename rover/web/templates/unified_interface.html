@@ -225,10 +225,14 @@
         <div class="content">
             <!-- Camera Section -->
             <div class="video-section">
-                <img id="videoFeed" class="video-feed" src="/video_feed" alt="Camera Stream">
+                <img id="videoFeed" class="video-feed" src="/camera/video_feed" alt="Camera Stream">
+                <div id="noCamera" style="display: none; text-align: center; padding: 20px;">
+                    <p>Camera not available</p>
+                    <p>This is expected on Mac - the camera will work on Raspberry Pi</p>
+                </div>
                 <div class="video-controls">
-                    <button class="video-btn" onclick="startCamera()">Start Camera</button>
-                    <button class="video-btn stop" onclick="stopCamera()">Stop Camera</button>
+                    <button id="startBtn" class="video-btn" onclick="startCamera()">Start Camera</button>
+                    <button id="stopBtn" class="video-btn stop" onclick="stopCamera()">Stop Camera</button>
                 </div>
             </div>
             
