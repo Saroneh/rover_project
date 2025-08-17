@@ -300,16 +300,20 @@
         
         // Camera controls
         function startCamera() {
-            fetch('/start_stream')
+            fetch('/camera/start', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
                         document.getElementById('cameraStatus').textContent = 'Streaming';
+                        document.getElementById('startBtn').disabled = true;
+                        document.getElementById('stopBtn').disabled = false;
+                        document.getElementById('videoFeed').style.display = 'block';
+                        document.getElementById('noCamera').style.display = 'none';
                         showMessage('Camera started successfully', 'success');
                         
                         // Refresh the video stream with cache busting
                         const videoFeed = document.getElementById('videoFeed');
-                        videoFeed.src = '/video_feed?' + new Date().getTime();
+                        videoFeed.src = '/camera/video_feed?' + new Date().getTime();
                         
                         // Update button states
                         updateButtonStates();
@@ -321,7 +325,7 @@
         }
         
         function stopCamera() {
-            fetch('/stop_stream')
+            fetch('/camera/stop', { method: 'POST' })
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -342,7 +346,7 @@
         }
         
         function updateButtonStates() {
-            fetch('/status')
+            fetch('/camera/status')
                 .then(response => response.json())
                 .then(data => {
                     const startBtn = document.querySelector('.video-btn:not(.stop)');
