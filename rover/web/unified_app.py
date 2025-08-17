@@ -40,6 +40,7 @@ class CameraStream:
         self.framerate = framerate
         self.camera = None
         self.is_streaming = False
+        self.camera_type = None  # 'picamera2', 'opencv', or None
         
         # Initialize camera
         self._setup_camera()
@@ -47,6 +48,10 @@ class CameraStream:
     def _setup_camera(self):
         """Initialize the Pi Camera with picamera2."""
         try:
+            # Try to import picamera2 with proper path handling
+            import sys
+            sys.path.append('/usr/lib/python3/dist-packages')
+            
             from picamera2 import Picamera2
             
             # Initialize camera
@@ -61,13 +66,14 @@ class CameraStream:
             
             # Start camera
             self.camera.start()
-            logger.info(f"Camera initialized successfully at {self.resolution} resolution, {self.framerate} fps")
+            self.camera_type = 'picamera2'
+            logger.info(f"Pi Camera initialized successfully at {self.resolution} resolution, {self.framerate} fps")
             
         except ImportError:
             logger.warning("picamera2 not available, using OpenCV fallback")
             self._setup_opencv_fallback()
         except Exception as e:
-            logger.error(f"Failed to initialize camera: {e}")
+            logger.error(f"Failed to initialize Pi Camera: {e}")
             self._setup_opencv_fallback()
     
     def _setup_opencv_fallback(self):
@@ -83,36 +89,50 @@ class CameraStream:
                         break
                 
             if self.camera.isOpened():
+                # Set camera properties
                 self.camera.set(cv2.CAP_PROP_FRAME_WIDTH, self.resolution[0])
                 self.camera.set(cv2.CAP_PROP_FRAME_HEIGHT, self.resolution[1])
                 self.camera.set(cv2.CAP_PROP_FPS, self.framerate)
-                logger.info("OpenCV camera fallback initialized")
+                
+                # Test if we can actually capture a frame
+                ret, test_frame = self.camera.read()
+                if ret and test_frame is not None:
+                    self.camera_type = 'opencv'
+                    logger.info("OpenCV camera fallback initialized successfully")
+                else:
+                    logger.warning("OpenCV camera opened but can't capture frames")
+                    self.camera_type = None
             else:
-                logger.error("No camera available")
+                logger.error("No OpenCV camera available")
+                self.camera_type = None
                 
         except Exception as e:
             logger.error(f"Failed to initialize OpenCV camera: {e}")
+            self.camera_type = None
     
     def get_frame(self):
         """Capture a single frame from the camera."""
-        if self.camera is None:
+        if self.camera is None or self.camera_type is None:
             return None
             
         try:
-            if hasattr(self.camera, 'capture_array'):
+            if self.camera_type == 'picamera2':
                 # picamera2
                 frame = self.camera.capture_array()
-                # Convert BGR to RGB
+                # Convert BGR to RGB if needed
                 import cv2
-                frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            else:
+                if len(frame.shape) == 3 and frame.shape[2] == 3:
+                    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            elif self.camera_type == 'opencv':
                 # OpenCV fallback
                 import cv2
                 ret, frame = self.camera.read()
-                if not ret:
+                if not ret or frame is None:
                     return None
                 # Convert BGR to RGB
                 frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            else:
+                return None
                 
             return frame
             
@@ -210,7 +230,8 @@ def camera_status():
             "status": "success",
             "is_streaming": camera.is_streaming,
             "resolution": camera.resolution,
-            "framerate": camera.framerate
+            "framerate": camera.framerate,
+            "camera_type": camera.camera_type
         })
     return jsonify({"status": "error", "message": "Camera not available"})
 
@@ -298,7 +319,8 @@ def system_status():
         "camera": {
             "is_streaming": camera.is_streaming if camera else False,
             "resolution": camera.resolution if camera else None,
-            "framerate": camera.framerate if camera else None
+            "framerate": camera.framerate if camera else None,
+            "camera_type": camera.camera_type if camera else None
         },
         "motor": {
             "status": "ready",
