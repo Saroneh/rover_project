@@ -225,7 +225,7 @@
         <div class="content">
             <!-- Camera Section -->
             <div class="video-section">
-                <img id="videoFeed" class="video-feed" src="/camera/video_feed" alt="Camera Stream">
+                <img id="videoFeed" class="video-feed" src="/video_feed" alt="Camera Stream">
                 <div class="video-controls">
                     <button class="video-btn" onclick="startCamera()">Start Camera</button>
                     <button class="video-btn stop" onclick="stopCamera()">Stop Camera</button>
@@ -300,7 +300,7 @@
         
         // Camera controls
         function startCamera() {
-            fetch('/camera/start', { method: 'POST' })
+            fetch('/start_stream')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -309,7 +309,7 @@
                         
                         // Refresh the video stream with cache busting
                         const videoFeed = document.getElementById('videoFeed');
-                        videoFeed.src = '/camera/video_feed?' + new Date().getTime();
+                        videoFeed.src = '/video_feed?' + new Date().getTime();
                         
                         // Update button states
                         updateButtonStates();
@@ -321,7 +321,7 @@
         }
         
         function stopCamera() {
-            fetch('/camera/stop', { method: 'POST' })
+            fetch('/stop_stream')
                 .then(response => response.json())
                 .then(data => {
                     if (data.status === 'success') {
@@ -342,7 +342,7 @@
         }
         
         function updateButtonStates() {
-            fetch('/camera/status')
+            fetch('/status')
                 .then(response => response.json())
                 .then(data => {
                     const startBtn = document.querySelector('.video-btn:not(.stop)');
