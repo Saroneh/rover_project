@@ -1,20 +1,24 @@
-# Raspberry Pi specific requirements for rover project
+# Raspberry Pi requirements for rover project - STABLE VERSIONS
 # Install with: pip3 install -r requirements_pi.txt
+# These versions are tested and working on Raspberry Pi
 
-# Core web framework
+# Core web framework - stable versions
 Flask==2.3.3
 Werkzeug==2.3.7
 
-# Camera and image processing
-opencv-python==4.8.1.78
+# Camera and image processing - STABLE versions
+opencv-python==4.7.0.72
 numpy==1.24.3
-picamera2==0.3.12
+picamera2==0.3.9
 
-# GPIO control for Raspberry Pi
+# GPIO control for Raspberry Pi - stable version
 RPi.GPIO==0.7.1
 
-# Development and testing
+# Development and testing - stable version
 gpiozero==2.0
 
-# Optional: For better performance
-Pillow==10.0.1
+# Optional: For better performance - stable version
+Pillow==9.5.0
+
+# Note: These versions are tested and working on Raspberry Pi
+# If you get errors, try: pip3 install --force-reinstall -r requirements_pi.txt
