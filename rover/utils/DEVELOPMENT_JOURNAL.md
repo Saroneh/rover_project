@@ -162,6 +162,42 @@ head -20 filename
 
 ---
 
+## 🎯 **Day 3: Integration & Web Interface Fixes**
+
+### **What We Accomplished**
+- ✅ **Integrated new camera system** into existing unified app (`rover.web.unified_app`)
+- ✅ **Fixed web interface endpoints** - updated HTML to use correct camera routes
+- ✅ **Resolved JavaScript errors** - added missing HTML element IDs
+- ✅ **Unified architecture** - one webserver handles both camera AND motor controls
+- ✅ **Camera streaming working** - live video feed accessible from Mac browser
+
+### **Key Challenges & Solutions**
+
+#### **Challenge 5: Web Interface Endpoint Mismatch**
+- **Problem:** HTML calling `/start_stream` but server only had `/camera/start`
+- **Root Cause:** HTML template was using old camera system endpoints
+- **Solution:** Updated all JavaScript functions to use correct `/camera/*` endpoints
+
+#### **Challenge 6: Missing HTML Elements**
+- **Problem:** JavaScript trying to access non-existent elements (`startBtn`, `stopBtn`, `noCamera`)
+- **Root Cause:** HTML template missing required element IDs
+- **Solution:** Added missing IDs and `noCamera` div to HTML template
+
+### **Technical Improvements**
+- **Architecture:** Moved from separate camera server to unified app
+- **Endpoints:** Standardized all camera routes under `/camera/*` namespace
+- **Error Handling:** Fixed JavaScript null reference errors
+- **User Experience:** Seamless camera start/stop with proper button states
+
+### **Current Status**
+- ✅ **Motor system:** Fully functional with mock GPIO, ready for real hardware
+- ✅ **Camera system:** Working on Pi with real camera, integrated into unified app
+- ✅ **Web interface:** Beautiful unified dashboard working with both camera and motor controls
+- ✅ **Integration:** Complete - camera and motors work together in one interface
+- 🎯 **Next goal:** Test with real motor hardware and add autonomous features
+
+---
+
 *Journal created: August 16, 2025*
 *Project: Autonomous Rover with Raspberry Pi*
-*Status: Camera system working, integration pending*
+*Status: Camera and motor integration complete, ready for hardware testing*
