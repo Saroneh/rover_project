@@ -9,6 +9,10 @@ import time
 import logging
 from datetime import datetime
 from flask import Flask, Response, render_template, request, redirect, url_for, jsonify
+# Configure logging first
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 from rover.utils.gpio_factory import create_gpio_controller
 from rover.core.motor_controller import MotorController
 
@@ -24,10 +28,6 @@ except ImportError:
     except ImportError:
         logger.error("No camera stream module available")
         CameraStream = None
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Initialize Flask app
 app = Flask(__name__)
