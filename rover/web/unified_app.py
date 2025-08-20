@@ -18,8 +18,8 @@ from rover.core.motor_controller import MotorController
 
 # Import the working camera stream
 try:
-    from rover.vision.camera_stream import CameraStream
-    logger.info("Using working camera stream from rover.vision.camera_stream")
+    from rover.vision.camera_stream_working import CameraStream
+    logger.info("Using working camera stream from rover.vision.camera_stream_working")
 except ImportError:
     # Fallback to simple camera if main one fails
     try:
