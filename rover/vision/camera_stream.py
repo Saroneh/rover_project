@@ -51,11 +51,9 @@ class CameraStream:
             # Initialize camera
             self.camera = Picamera2()
             
-            # Use the correct modern configuration method
-            # This avoids the allocator attribute error
+            # Use the original working configuration
             config = self.camera.create_preview_configuration(
-                main={"size": self.resolution, "format": "BGR888"},
-                buffer_count=4  # Add buffer count to prevent memory issues
+                main={"size": self.resolution, "format": "RGB888"}
             )
             
             # Apply configuration
@@ -63,9 +61,6 @@ class CameraStream:
             
             # Start camera
             self.camera.start()
-            
-            # Wait a moment for camera to stabilize
-            time.sleep(2)
             
             self.camera_type = 'picamera2'
             logger.info(f"Pi Camera initialized successfully at {self.resolution} resolution, {self.framerate} fps")
